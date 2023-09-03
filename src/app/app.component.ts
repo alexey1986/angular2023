@@ -52,9 +52,7 @@ export class AppComponent implements OnInit, OnDestroy {
         (
           filter((value) => value.length > 2),
           debounceTime(300),
-          switchMap((value) => {
-            return this.mockDataService.getCharacters(value);
-          })
+          switchMap((value) => this.mockDataService.getCharacters(value))
         );
         // YOUR CODE ENDS HERE
   }
@@ -63,16 +61,14 @@ export class AppComponent implements OnInit, OnDestroy {
     // 4. On clicking the button 'Load Characters And Planets', it is necessary to process two requests and combine the results of both requests into one result array. As a result, a list with the names of the characters and the names of the planets is displayed on the screen.
     // Your code should looks like this: this.planetAndCharactersResults$ = /* Your code */
     // YOUR CODE STARTS HERE
-    const characters = this.mockDataService.getCharacters();
-    const planets = this.mockDataService.getPlatents();
+    const characters$ = this.mockDataService.getCharacters();
+    const planets$ = this.mockDataService.getPlatents();
 
     this.planetAndCharactersResults$ = forkJoin([
-      characters,
-      planets,
+      characters$,
+      planets$,
     ]).pipe(
-      map(([characters, planets]) => {
-        return [...characters, ...planets];
-      })
+      map(([characters, planets]) => [...characters, ...planets])
     );
     // YOUR CODE ENDS HERE
   }
@@ -84,10 +80,10 @@ export class AppComponent implements OnInit, OnDestroy {
     - Subscribe to changes
     - Check the received value using the areAllValuesTrue function and pass them to the isLoading variable. */
     // YOUR CODE STARTS HERE
-    const getCharactersLoader$ = this.mockDataService.getCharactersLoader();
-    const getPlanetLoader$ = this.mockDataService.getPlanetLoader();
+    const characters$ = this.mockDataService.getCharactersLoader();
+    const planets$ = this.mockDataService.getPlanetLoader();
 
-    combineLatest(getCharactersLoader$, getPlanetLoader$).subscribe(
+    combineLatest(planets$, characters$).subscribe(
       ([charactersLoader, planetLoader]) => {
         this.isLoading = this.areAllValuesTrue([charactersLoader, planetLoader]);
       }
